@@ -10,10 +10,15 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+    # Системный чит-код: находим ядро и копируем его во все возможные папки перед сборкой!
+    - name: Fix Jar Path
+      run: |
+        mkdir -p FrostJack/src/main/resources/
+        find . -name "paper-api.jar" -exec cp {} FrostJack/src/main/resources/paper-api.jar \;
     - name: Build with Maven
       run: mvn -f FrostJack/pom.xml clean package
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: FrostJackPlugin
-        path: FrostJack/target/*.jar
+        path: "**/target/*.jar"

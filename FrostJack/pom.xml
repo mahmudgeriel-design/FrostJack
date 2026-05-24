@@ -16,7 +16,7 @@
     </properties>
 
     <dependencies>
-        <!-- Локальное ядро из ресурсов -->
+        <!-- Скорректировали путь, убрав лишнее дублирование папок -->
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper-api</artifactId>

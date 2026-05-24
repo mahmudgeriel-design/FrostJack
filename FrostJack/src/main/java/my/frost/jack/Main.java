@@ -49,7 +49,6 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
 
     private void checkHelmetEffects(Player player) {
         ItemStack helmet = player.getInventory().getHelmet();
-        // Отслеживаем круглую PLAYER_HEAD по имени
         if (helmet != null && helmet.getType() == Material.PLAYER_HEAD && helmet.hasItemMeta() && ITEM_NAME.equals(helmet.getItemMeta().getDisplayName())) {
             if (!player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE)) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100, 0, false, false));
@@ -73,9 +72,9 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) return true;
 
-        // Железобетонный чит-код: выдаём круглую 3D-тыкву с текстурой РВ через скрытую консольную команду!
+        // Полностью исправили экранирование кавычек в строке текстуры под 1.16.5
         String textureCode = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmI3OGY5ZDU0YzRkYzk2N2UzNTI1YmQxYjI1YTNhNTEzNzZkMTNjYWFjNjVlYmU2YmU1ZGM3NTkyMWYifX19";
-        String giveCommand = "minecraft:give " + target.getName() + " player_head{SkullOwner:{Id:[I;1,2,3,4],Properties:{textures:[{Value:\"" + textureCode + "\"}]}},display:{Name:'{\"text\":\"§dГолова Джека\",\"italic\":false}',Lore:['{\"text\":\"\"}','{\"text\":\"§fЭксклюзивный предмет сервера §bFrostWorld\",\"italic\":false}','{\"text\":\"\"}','{\"text\":\"§6⚡ Пассивный эффект:\",\"italic\":false}','{\"text\":\" §7• §cСила I (При ношении)\",\"italic\":false}','{\"text\":\"\"}']},Enchantments:[{id:\"minecraft:protection\",lvl:4},{id:\"minecraft:vanishing_curse\",lvl:1}],AttributeModifiers:[{AttributeName:\"generic.max_health\",Name:\"jack_hp\",Amount:6.0,Operation:0,UUID:[I;11,11,11,11],Slot:\"head\"},{AttributeName:\"generic.armor_toughness\",Name:\"jack_tough\",Amount:2.0,Operation:0,UUID:[I;22,22,22,22],Slot:\"head\"},{AttributeName:\"generic.movement_speed\",Name:\"jack_speed\",Amount:0.20,Operation:1,UUID:[I;33,33,33,33],Slot:\"head\"}]} 1";
+        String giveCommand = "minecraft:give " + target.getName() + " player_head{SkullOwner:{Id:[I;1,2,3,4],Properties:{textures:[{Value:\"" + textureCode + "\"}]}},display:{Name:'\"§dГолова Джека\"',Lore:['\"\"','\"§fЭксклюзивный предмет сервера §bFrostWorld\"','\"\"','\"§6⚡ Пассивный эффект:\"','\" §7• §cСила I (При ношении)\"','\"\"']},Enchantments:[{id:\"minecraft:protection\",lvl:4},{id:\"minecraft:vanishing_curse\",lvl:1}],AttributeModifiers:[{AttributeName:\"generic.max_health\",Name:\"jack_hp\",Amount:6.0,Operation:0,UUID:[I;11,11,11,11],Slot:\"head\"},{AttributeName:\"generic.armor_toughness\",Name:\"jack_tough\",Amount:2.0,Operation:0,UUID:[I;22,22,22,22],Slot:\"head\"},{AttributeName:\"generic.movement_speed\",Name:\"jack_speed\",Amount:0.20,Operation:1,UUID:[I;33,33,33,33],Slot:\"head\"}]} 1";
         
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), giveCommand);
         return true;

@@ -20,14 +20,11 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-import java.lang.reflect.Field;
 import java.util.*;
 
 public final class Main extends JavaPlugin implements Listener, CommandExecutor {
@@ -47,12 +44,12 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
             }
         }.runTaskTimer(this, 20L, 20L);
         
-        getLogger().info("Самопис FrostJack с круглой 3D-головой запущен!");
+        getLogger().info("Самопис FrostJack с круглой 3D-головой успешно запущен!");
     }
 
     private void checkHelmetEffects(Player player) {
         ItemStack helmet = player.getInventory().getHelmet();
-        // Проверяем PLAYER_HEAD вместо тыквы
+        // Отслеживаем круглую PLAYER_HEAD по имени
         if (helmet != null && helmet.getType() == Material.PLAYER_HEAD && helmet.hasItemMeta() && ITEM_NAME.equals(helmet.getItemMeta().getDisplayName())) {
             if (!player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE)) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100, 0, false, false));
@@ -76,48 +73,11 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) return true;
 
-        // Создаем голову игрока как основу для 3D шара
-        ItemStack jack = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta meta = (SkullMeta) jack.getItemMeta();
-        meta.setDisplayName(ITEM_NAME);
-
-        // Вживляем официальную текстуру Головы Джека с РВ через GameProfile
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-        // Ссылка на скин зловещей хэллоуинской тыквы-шара
-        String texture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmI3OGY5ZDU0YzRkYzk2N2UzNTI1YmQxYjI1YTNhNTEzNzZkMTNjYWFjNjVlYmU2YmU1ZGM3NTkyMWYifX19";
-        profile.getProperties().put("textures", new Property("textures", texture));
+        // Железобетонный чит-код: выдаём круглую 3D-тыкву с текстурой РВ через скрытую консольную команду!
+        String textureCode = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmI3OGY5ZDU0YzRkYzk2N2UzNTI1YmQxYjI1YTNhNTEzNzZkMTNjYWFjNjVlYmU2YmU1ZGM3NTkyMWYifX19";
+        String giveCommand = "minecraft:give " + target.getName() + " player_head{SkullOwner:{Id:[I;1,2,3,4],Properties:{textures:[{Value:\"" + textureCode + "\"}]}},display:{Name:'{\"text\":\"§dГолова Джека\",\"italic\":false}',Lore:['{\"text\":\"\"}','{\"text\":\"§fЭксклюзивный предмет сервера §bFrostWorld\",\"italic\":false}','{\"text\":\"\"}','{\"text\":\"§6⚡ Пассивный эффект:\",\"italic\":false}','{\"text\":\" §7• §cСила I (При ношении)\",\"italic\":false}','{\"text\":\"\"}']},Enchantments:[{id:\"minecraft:protection\",lvl:4},{id:\"minecraft:vanishing_curse\",lvl:1}],AttributeModifiers:[{AttributeName:\"generic.max_health\",Name:\"jack_hp\",Amount:6.0,Operation:0,UUID:[I;11,11,11,11],Slot:\"head\"},{AttributeName:\"generic.armor_toughness\",Name:\"jack_tough\",Amount:2.0,Operation:0,UUID:[I;22,22,22,22],Slot:\"head\"},{AttributeName:\"generic.movement_speed\",Name:\"jack_speed\",Amount:0.20,Operation:1,UUID:[I;33,33,33,33],Slot:\"head\"}]} 1";
         
-        try {
-            Field profileField = meta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(meta, profile);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 4, true);
-        meta.addEnchant(Enchantment.VANISHING_CURSE, 1, true);
-
-        AttributeModifier speedMod = new AttributeModifier(UUID.fromString("33333333-3333-3333-3333-333333333333"), "jack_speed", 0.20, AttributeModifier.Operation.ADD_SCALAR, EquipmentSlot.HEAD);
-        meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, speedMod);
-
-        AttributeModifier healthMod = new AttributeModifier(UUID.fromString("11111111-1111-1111-1111-111111111111"), "jack_health", 6.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
-        meta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, healthMod);
-
-        AttributeModifier toughnessMod = new AttributeModifier(UUID.fromString("22222222-2222-2222-2222-222222222222"), "jack_toughness", 2.0, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughnessMod);
-
-        meta.setLore(Arrays.asList(
-            "§7",
-            "§fЭксклюзивный предмет сервера §bFrostWorld",
-            "§7",
-            "§6⚡ Пассивный эффект:",
-            " §7• §cСила I (При ношении)",
-            "§7"
-        ));
-        jack.setItemMeta(meta);
-
-        target.getInventory().addItem(jack);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), giveCommand);
         return true;
     }
 

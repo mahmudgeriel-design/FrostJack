@@ -53,7 +53,8 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
             if (!player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE)) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100, 0, false, false));
                 
-                player.sendMessage("§6§lFROSTWORLD §8» §eВы надели §dГолову Джека§e! Сила Хэллоуина активирована.");
+                // Перешли на ванильный ChatColor, чтобы обойти ошибку BaseComponent
+                player.sendMessage(org.bukkit.ChatColor.GOLD + "" + org.bukkit.ChatColor.BOLD + "FROSTWORLD " + org.bukkit.ChatColor.DARK_GRAY + "» " + org.bukkit.ChatColor.YELLOW + "Вы надели " + org.bukkit.ChatColor.LIGHT_PURPLE + "Голову Джека" + org.bukkit.ChatColor.YELLOW + "! Сила Хэллоуина активирована.");
                 player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.5f, 1.4f);
                 player.getWorld().spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 15, 0.3, 0.3, 0.3, 0.1);
             } else {
@@ -62,7 +63,7 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
         } else {
             if (player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE) && player.getPotionEffect(PotionEffectType.INCREASE_DAMAGE).getDuration() <= 100) {
                 player.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
-                player.sendMessage("§6§lFROSTWORLD §8» §7Эффекты Головы Джека рассеялись.");
+                player.sendMessage(org.bukkit.ChatColor.GOLD + "" + org.bukkit.ChatColor.BOLD + "FROSTWORLD " + org.bukkit.ChatColor.DARK_GRAY + "» " + org.bukkit.ChatColor.GRAY + "Эффекты Головы Джека рассеялись.");
             }
         }
     }
@@ -110,7 +111,7 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
         jack.setItemMeta(meta);
 
         target.getInventory().addItem(jack);
-        sender.sendMessage("§6§lFrostWorld §8» §eВыдали предмет игроку §b" + target.getName());
+        sender.sendMessage(org.bukkit.ChatColor.GOLD + "" + org.bukkit.ChatColor.BOLD + "FrostWorld " + org.bukkit.ChatColor.DARK_GRAY + "» " + org.bukkit.ChatColor.YELLOW + "Выдали предмет игроку " + org.bukkit.ChatColor.AQUA + target.getName());
         return true;
     }
 

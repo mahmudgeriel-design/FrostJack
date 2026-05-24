@@ -53,8 +53,7 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
             if (!player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE)) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100, 0, false, false));
                 
-                // Перешли на ванильный ChatColor, чтобы обойти ошибку BaseComponent
-                player.sendMessage(org.bukkit.ChatColor.GOLD + "" + org.bukkit.ChatColor.BOLD + "FROSTWORLD " + org.bukkit.ChatColor.DARK_GRAY + "» " + org.bukkit.ChatColor.YELLOW + "Вы надели " + org.bukkit.ChatColor.LIGHT_PURPLE + "Голову Джека" + org.bukkit.ChatColor.YELLOW + "! Сила Хэллоуина активирована.");
+                // Звук и партиклы РВ при надевании (без ломающих BaseComponent текстовых сообщений)
                 player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.5f, 1.4f);
                 player.getWorld().spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 15, 0.3, 0.3, 0.3, 0.1);
             } else {
@@ -63,7 +62,6 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
         } else {
             if (player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE) && player.getPotionEffect(PotionEffectType.INCREASE_DAMAGE).getDuration() <= 100) {
                 player.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
-                player.sendMessage(org.bukkit.ChatColor.GOLD + "" + org.bukkit.ChatColor.BOLD + "FROSTWORLD " + org.bukkit.ChatColor.DARK_GRAY + "» " + org.bukkit.ChatColor.GRAY + "Эффекты Головы Джека рассеялись.");
             }
         }
     }
@@ -71,16 +69,13 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission("jack.admin")) {
-            sender.sendMessage("§cУ вас нет прав!");
             return true;
         }
         if (args.length != 1) {
-            sender.sendMessage("§cИспользуйте: /jackgive <ник>");
             return true;
         }
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) {
-            sender.sendMessage("§cИгрок не найден!");
             return true;
         }
 
@@ -111,7 +106,6 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
         jack.setItemMeta(meta);
 
         target.getInventory().addItem(jack);
-        sender.sendMessage(org.bukkit.ChatColor.GOLD + "" + org.bukkit.ChatColor.BOLD + "FrostWorld " + org.bukkit.ChatColor.DARK_GRAY + "» " + org.bukkit.ChatColor.YELLOW + "Выдали предмет игроку " + org.bukkit.ChatColor.AQUA + target.getName());
         return true;
     }
 

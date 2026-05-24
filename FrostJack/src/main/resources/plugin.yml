@@ -1,0 +1,8 @@
+name: FrostJack
+version: 1.0
+main: my.frost.jack.Main
+api-version: 1.16
+commands:
+  jackgive:
+    description: Выдать Голову Джека игроку
+    permission: jack.admin

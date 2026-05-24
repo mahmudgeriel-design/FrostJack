@@ -20,11 +20,14 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import java.lang.reflect.Field;
 import java.util.*;
 
 public final class Main extends JavaPlugin implements Listener, CommandExecutor {
@@ -44,16 +47,16 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
             }
         }.runTaskTimer(this, 20L, 20L);
         
-        getLogger().info("Самопис FrostJack успешно запущен!");
+        getLogger().info("Самопис FrostJack с круглой 3D-головой запущен!");
     }
 
     private void checkHelmetEffects(Player player) {
         ItemStack helmet = player.getInventory().getHelmet();
-        if (helmet != null && helmet.getType() == Material.JACK_O_LANTERN && helmet.hasItemMeta() && ITEM_NAME.equals(helmet.getItemMeta().getDisplayName())) {
+        // Проверяем PLAYER_HEAD вместо тыквы
+        if (helmet != null && helmet.getType() == Material.PLAYER_HEAD && helmet.hasItemMeta() && ITEM_NAME.equals(helmet.getItemMeta().getDisplayName())) {
             if (!player.hasPotionEffect(PotionEffectType.INCREASE_DAMAGE)) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100, 0, false, false));
                 
-                // Звук и партиклы РВ при надевании (без ломающих BaseComponent текстовых сообщений)
                 player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.5f, 1.4f);
                 player.getWorld().spawnParticle(Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 15, 0.3, 0.3, 0.3, 0.1);
             } else {
@@ -68,20 +71,29 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!sender.hasPermission("jack.admin")) {
-            return true;
-        }
-        if (args.length != 1) {
-            return true;
-        }
+        if (!sender.hasPermission("jack.admin")) return true;
+        if (args.length != 1) return true;
         Player target = Bukkit.getPlayer(args[0]);
-        if (target == null) {
-            return true;
-        }
+        if (target == null) return true;
 
-        ItemStack jack = new ItemStack(Material.JACK_O_LANTERN);
-        ItemMeta meta = jack.getItemMeta();
+        // Создаем голову игрока как основу для 3D шара
+        ItemStack jack = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta meta = (SkullMeta) jack.getItemMeta();
         meta.setDisplayName(ITEM_NAME);
+
+        // Вживляем официальную текстуру Головы Джека с РВ через GameProfile
+        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+        // Ссылка на скин зловещей хэллоуинской тыквы-шара
+        String texture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmI3OGY5ZDU0YzRkYzk2N2UzNTI1YmQxYjI1YTNhNTEzNzZkMTNjYWFjNjVlYmU2YmU1ZGM3NTkyMWYifX19";
+        profile.getProperties().put("textures", new Property("textures", texture));
+        
+        try {
+            Field profileField = meta.getClass().getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(meta, profile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 4, true);
         meta.addEnchant(Enchantment.VANISHING_CURSE, 1, true);
@@ -113,12 +125,12 @@ public final class Main extends JavaPlugin implements Listener, CommandExecutor 
     public void onItemDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Item item) {
             ItemStack stack = item.getItemStack();
-            if (stack.getType() == Material.JACK_O_LANTERN && stack.hasItemMeta() && ITEM_NAME.equals(stack.getItemMeta().getDisplayName())) {
+            if (stack.getType() == Material.PLAYER_HEAD && stack.hasItemMeta() && ITEM_NAME.equals(stack.getItemMeta().getDisplayName())) {
                 event.setCancelled(true);
             }
         }
     }
 
     @EventHandler public void onInv(InventoryClickEvent e) { if (e.getSlotType() == InventoryType.SlotType.ARMOR && e.getWhoClicked() instanceof Player p) new BukkitRunnable(){@Override public void run(){checkHelmetEffects(p);}}.runTaskLater(this, 1L); }
-    @EventHandler public void onInteract(PlayerInteractEvent e) { if (e.getItem() != null && e.getItem().getType() == Material.JACK_O_LANTERN) new BukkitRunnable(){@Override public void run(){checkHelmetEffects(e.getPlayer());}}.runTaskLater(this, 1L); }
+    @EventHandler public void onInteract(PlayerInteractEvent e) { if (e.getItem() != null && e.getItem().getType() == Material.PLAYER_HEAD) new BukkitRunnable(){@Override public void run(){checkHelmetEffects(e.getPlayer());}}.runTaskLater(this, 1L); }
 }
